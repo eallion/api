@@ -1,0 +1,162 @@
+{
+  "name": "api-eallion-com",
+  "nodeVersion": "22.11.0",
+  "rewrites": [
+    {
+      "source": "/cravatar/*",
+      "destination": "/gravatar/:splat"
+    }
+  ],
+  "headers": [
+      {
+        "source": "/*",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      {
+        "source": "/cravatar*",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "image/webp"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
+      },
+      {
+        "source": "/gravatar*",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "image/webp"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
+      },
+      {
+        "source": "/mastodon*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/memos*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/ip*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/geo*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/favicon*",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "image/png"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
+      }
+    ],
+  "cache": [
+    {
+      "source": "/bing*",
+      "cacheTtl": 3600
+    },
+    {
+      "source": "/favicon*",
+      "cacheTtl": 604800
+    },
+    {
+      "source": "/og*",
+      "cacheTtl": 604800
+    },
+    {
+      "source": "/cravatar*",
+      "cacheTtl": 604800
+    },
+    {
+      "source": "/gravatar*",
+      "cacheTtl": 604800
+    },
+    {
+      "source": "/memos*",
+      "cacheTtl": 0
+    },
+    {
+      "source": "/mastodon*",
+      "cacheTtl": 0
+    },
+    {
+      "source": "/ip*",
+      "cacheTtl": 0
+    },
+    {
+      "source": "/geo*",
+      "cacheTtl": 0
+    }
+  ]
+}

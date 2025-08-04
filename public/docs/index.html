@@ -1,0 +1,359 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width initial-scale=1'>
+  <title>API | api.eallion.com</title>
+  <link href='https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap'
+    rel='stylesheet' type='text/css' />
+  <link rel="stylesheet" href="docs/style.css">
+</head>
+
+<body class='typora-export os-windows'>
+  <div class='typora-export-content'>
+    <div id='write' class=''>
+      <h1 id='api-works'><span>API Works!</span></h1>
+      <p><span>End Point: </span><em><span>Jul 26, 2024.</span></em></p>
+      <blockquote>
+        <p><span>e.g:</span><br /><a href='https://api.eallion.com/bing'
+            target="_blank"><span>https://api.eallion.com/bing</span></a><span></span><br /><a
+            href='https://api.eallion.com/bing?type=image'
+            target="_blank"><span>https://api.eallion.com/bing?type=image</span></a></p>
+      </blockquote>
+      <hr />
+      <h3 id='bing'><code>/bing</code><span></span></h3>
+      <p><span>反代 Bing 每日壁纸 (</span><a href='https://github.com/eallion/bing-php-api'
+          target="_blank"><span>Docs</span></a><span>)</span></p>
+      <blockquote>
+        <p><a href='https://api.eallion.com/bing?type=image' target="_blank" target='_blank'
+            class='url'>https://api.eallion.com/bing?type=image</a></p>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><span>/bing</span></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>type</code></td>
+              <td><a href='https://api.eallion.com/bing?type=image' target="_blank"><span>type=image</span></a></td>
+              <td><span>当该字段等于
+                </span><code>image</code><span>时，返回参数会新增一个</span><code>redirect</code><span>值为壁纸的地址，同时直接返回图片</span></td>
+            </tr>
+            <tr>
+              <td><code>region</code></td>
+              <td><a href='https://api.eallion.com/bing?type=image&amp;region=zh-CN'
+                  target="_blank"><span>region=zh-CN</span></a></td>
+              <td><span>Bing
+                  每日壁纸的不同地区，每个地区的壁纸都不一样，默认：</span><code>en-US</code><span>，可选：</span><code>zh-CN, en-US, ja-JP, en-AU, en-UK, de-DE, en-NZ, en-CA</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>date</code></td>
+              <td><a href='https://api.eallion.com/bing?type=image&amp;date=2022-07-24'
+                  target="_blank"><span>date=2022-07-24</span></a></td>
+              <td><span>指定一个日期，格式：</span><code>2006-01-02</code><span>，获取这个日期的壁纸，目测只能获取当前日期的前 10 天的壁纸</span></td>
+            </tr>
+            <tr>
+              <td><code>dpi</code></td>
+              <td><a href='https://api.eallion.com/bing?type=image&amp;dpi=uhd' target="_blank"><span>dpi=uhd</span></a>
+              </td>
+              <td>
+                <span>修改</span><code>redirect</code><span>默认的壁纸分辨率，默认</span><code>1920x1080</code>，可选<code>720</code>、<code>1080</code>、<code>720p</code>、<code>1080p</code>、<code>1080i</code>、<code>hd</code>、<code>uhd</code>、<code>2k</code>、<code>2.5k</code>、<code>2.8k</code>、<code>4k</code>、<code>m</code>、<code>small</code>、<code>thumbnail</code>、<code>mobile</code>、<code>original</code>、<code>1920x1200</code>、<code>1920x1080</code>、<code>1366x768</code>、<code>1280x768</code>、<code>1280x720</code>、<code>1024x768</code>、<code>800x600</code>、<code>800x480</code>、<code>768x1280</code>、<code>720x1280</code>、<code>640x480</code>、<code>480x800</code>、<code>400x240</code>、<code>320x240</code>、<code>240x320</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='favicon'><code>/favicon</code><span></span></h3>
+      <p><span>gstatic.cn 网站图标反代</span></p>
+      <blockquote>
+        <a
+            href='https://api.eallion.com/favicon?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url=https://www.eallion.com'
+            target="_blank"><span>https://api.eallion.com/favicon?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url=https://www.eallion.com</span></a>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><code>/favicon</code></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>size</code></td>
+              <td>128 / 64 / 32 ...</td>
+              <td><span>图标大小</span></td>
+            </tr>
+            <tr>
+              <td><code>url</code></td>
+              <td>https://www.eallion.com</td>
+              <td><span>Url 链接，需要 <code>http(s)://</code>Protocol</span></td>
+            </tr>
+            <tr>
+              <td><code>client</code></td>
+              <td>SOCIAL</td>
+              <td><span>不用修改</span></td>
+            </tr>
+            <tr>
+              <td><code>type</code></td>
+              <td>FAVICON</td>
+              <td><span>不用修改</span></td>
+            </tr>
+            <tr>
+              <td><code>fallback_opts</code></td>
+              <td>TYPE,SIZE,URL</td>
+              <td><span>不用修改</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='gravatar'><code>/gravatar</code><span></span></h3>
+      <p><span>反代 Gravatar</span></p>
+      <blockquote>
+        <p><a href='https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31'
+            target="_blank"><span>https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31</span></a></p>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><code>/gravatar</code></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>md5</code></td>
+              <td><a href='https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31'
+                  target="_blank"><span>171e4c30959e8c077a6c58b958624b31</span></a></td>
+              <td><span>电子邮件的 MD5 值</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='ip'><code>/ip</code><span></span></h3>
+      <p><span>获取自己的公网 IP </span></p>
+      <blockquote>
+        <p><a href='https://api.eallion.com/ip' target="_blank"><span>https://api.eallion.com/ip</span></a></p>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><code>/ip</code></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ip</code></td>
+              <td><a href='https://api.eallion.com/ip' target="_blank"><span>ip</span></a></td>
+              <td><span>返回公网 IP，支持 IPv6，返回默认值。</span></td>
+            </tr>
+            <tr>
+              <td><code>type=json</code></td>
+              <td><a href='https://api.eallion.com/ip?type=json' target="_blank"><span>type=json</span></a></td>
+              <td><span>返回 <code>.json</code>格式的公网 IP，支持 IPv6，返回默认值。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='geo'><code>/geo</code></h3>
+      <p><span>获取自己的 Geo 信息 </span></p>
+      <blockquote>
+        <p><a href='https://api.eallion.com/geo?key=cityName&type=json' target="_blank"><span>https://api.eallion.com/geo?key=cityName&type=json</span></a></p>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><span><code>/geo</code></span></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>key</code></td>
+              <td><a href='https://api.eallion.com/geo?key=cityName' target="_blank"><span>key=cityName</span></a>
+              </td>
+              <td>
+                <span>可用的 key：</span><code>ip</code>、<code>asn</code>、<code>countryName</code>、<code>countryCodeAlpha2</code>、<code>countryCodeAlpha3</code>、<code>countryCodeNumeric</code>、<code>regionName</code>、<code>regionCode</code>、<code>cityName</code>、<code>latitude</code>、<code>longitude</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>type=json</code></td>
+              <td><a href='https://api.eallion.com/geo?type=json' target="_blank"><span>type=json</span></a></td>
+              <td><span>返回 <code>.json</code>格式的 Geo 信息，支持 IPv6，返回默认值。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='mastodon'><code>/mastodon</code><span></span></h3>
+      <p><span>反代 @</span><a href='mailto:eallion@e5n.cc' target="_blank" target='_blank'
+          class='url'>eallion@e5n.cc</a><span> 实例的 API (</span><a
+          href='https://docs.joinmastodon.org/methods/accounts/#statuses'
+          target="_blank"><span>Docs</span></a><span>)</span></p>
+      <blockquote>
+        <a href='https://api.eallion.com/mastodon?limit=20&amp;exclude_replies=true&amp;exclude_reblogs=true'
+            target="_blank"><span>https://api.eallion.com/mastodon?limit=20&amp;exclude_replies=true&amp;exclude_reblogs=true</span></a>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><code>/mastodon</code></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>limit</code></td>
+              <td><a href='https://api.eallion.com/mastodon?limit=10' target="_blank"><span>limit=10</span></a></td>
+              <td><span>数据条数，最大值 40，如果需要请求更早数据，需要配合 </span><code>max_id</code></td>
+            </tr>
+            <tr>
+              <td><code>exclude_replies</code></td>
+              <td><a href='https://api.eallion.com/mastodon?limit=10&amp;exclude_replies=true'
+                  target="_blank"><span>exclude_replies=true</span></a></td>
+              <td><span>回复嘟文</span></td>
+            </tr>
+            <tr>
+              <td><code>exclude_reblogs</code></td>
+              <td><a href='https://api.eallion.com/mastodon?limit=10&amp;exclude_reblogs=true'
+                  target="_blank"><span>exclude_reblogs=true</span></a></td>
+              <td><span>转嘟</span></td>
+            </tr>
+            <tr>
+              <td><code>only_media</code></td>
+              <td><a href='https://api.eallion.com/mastodon?limit=10&amp;only_media=true'
+                  target="_blank"><span>only_media=true</span></a></td>
+              <td><span>仅包含媒体文件</span></td>
+            </tr>
+            <tr>
+              <td><code>max_id</code></td>
+              <td><a href='https://api.eallion.com/mastodon?limit=10&amp;max_id=' target="_blank"><span>max_id={STATUSES
+                    ID}</span></a></td>
+              <td><span>请求 </span><code>max_id</code><span>之前的嘟文，对应的有 </span><code>min_id</code></td>
+            </tr>
+            <tr>
+              <td><code>min_id</code></td>
+              <td><a href='https://api.eallion.com/mastodon?limit=10&amp;max_id=' target="_blank"><span>min_id={STATUSES
+                    ID}</span></a></td>
+              <td><span>请求 </span><code>min_id</code><span>之后的嘟文</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='memos'><code>/memos</code><span></span></h3>
+      <p><span>反代 memos.eallion.com 的 Memos 的 API (</span><a
+          href='https://memos.apidocumentation.com/reference#tag/memoservice/get/api/v1/memos'
+          target="_blank"><span>Docs</span></a><span>)</span></p>
+      <blockquote>
+        <p><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10'
+            target="_blank"><span>https://api.eallion.com/memos?parent=users/101&pageSize=10</span></a></p>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><code>/memos</code></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>parent</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10'
+                  target="_blank"><span>users/101</span></a></td>
+              <td><span>请求数量限制</span></td>
+            </tr>
+            <tr>
+              <td><code>pageSize</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10'
+                  target="_blank"><span>pageSize=10</span></a></td>
+              <td><code>pageSize</code><span>请看 Docs 的说明</span></td>
+            </tr>
+            <tr>
+              <td><code>pageToken</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10'
+                  target="_blank"><span>CAoQCg==</span></a></td>
+              <td><code>nextPageToken</code><span>请看 Docs 的说明</span></td>
+            </tr>
+            <tr>
+              <td><code>state</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10'
+                  target="_blank"><span><code>NORMAL</code><code>ARCHIVED</code></span></a></td>
+              <td><code>state</code><span>请看 Docs 的说明</span></td>
+            </tr>
+            <tr>
+              <td><code>sort</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10' target="_blank"><span>Default to
+                    display_time</span></a></td>
+              <td><code>sort</code><span>请看 Docs 的说明</span></td>
+            </tr>
+            <tr>
+              <td><code>direction</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10' target="_blank"><span>Default to
+                    DESC</span></a></td>
+              <td><code>direction</code><span>请看 Docs 的说明</span></td>
+            </tr>
+            <tr>
+              <td><code>filter</code></td>
+              <td><a href='https://api.eallion.com/memos?parent=users/101&pageSize=10'
+                  target="_blank"><span><code>Shortcut.filter</code></span></a></td>
+              <td><code>filter</code><span>请看 Docs 的说明</span></td>
+            </tr>
+            <tr>
+              <td><code>oldFilter</code></td>
+              <td><span>Deprecated</span></td>
+              <td><code>oldFilter</code><span>旧接口，已弃用。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <h3 id='og'><code>/og</code><span></span></h3>
+      <p><span>部署到 Vercel 的 OG Image API (</span><a href='https://www.eallion.com/og-image-api/'
+          target="_blank"><span>Docs</span></a><span>)</span></p>
+      <blockquote>
+        <p><a href='https://api.eallion.com/og?title=大大的小蜗牛'
+            target="_blank"><span>https://api.eallion.com/og?title=大大的小蜗牛</span></a></p>
+      </blockquote>
+      <figure class='table-figure'>
+        <table>
+          <thead>
+            <tr>
+              <th><code>/og</code></th>
+              <th><span>示例</span></th>
+              <th><span>说明</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>title</code></td>
+              <td><a href='https://api.eallion.com/og?title=大大的小蜗牛' target="_blank"><span>title=大大的小蜗牛</span></a></td>
+              <td><span>因 Vercel Edge Functions 的限制，中文字体已瘦身，大多数汉字无法显示</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <p><span>Powered by: GitHub / Vercel / Cloudflare / Aliyun / Tencent Cloud / Volcengine / Dogecloud.</span></p>
+      <p><span>Contact: </span><a href='matito:eallions@gmail.com' target="_blank"><span>eallions@gmail.com</span></a>
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>
