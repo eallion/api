@@ -35,6 +35,7 @@ export async function onRequest(context) {
       newResponseHeaders.set('Access-Control-Allow-Origin', '*');
       newResponseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
       newResponseHeaders.set('Access-Control-Allow-Headers', 'Content-Type');
+      newResponseHeaders.set('Access-Control-Max-Age', '0');
       
       // Disable caching for real-time requests
       newResponseHeaders.set('Cache-Control', 'no-store');

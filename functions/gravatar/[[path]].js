@@ -20,7 +20,10 @@ export async function onRequest(context) {
   if (!gravatarPath) {
     return new Response('Missing Gravatar hash', {
       status: 400,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: {
+        'Content-Type': 'text/plain',
+        'Cache-Control': 'no-cache'
+      }
     });
   }
 
@@ -53,8 +56,14 @@ export async function onRequest(context) {
     
     // 复制响应头
     const headers = new Headers(response.headers);
-    headers.set('Cache-Control', 'public, max-age=86400');
+    headers.set('Cache-Control', 'public, max-age=604800');
+    headers.set('access-control-allow-origin', '*');
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    headers.set('Content-Type', 'image/webp');
+    headers.set('Access-Control-Max-Age', '604800');
     headers.delete('Set-Cookie'); // 移除敏感头
+    headers.delete('Cookie');
     
     return new Response(response.body, {
       status: response.status,
@@ -65,7 +74,10 @@ export async function onRequest(context) {
   } catch (err) {
     return new Response('Internal Server Error', {
       status: 500,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: {
+        'Content-Type': 'text/plain',
+        'Cache-Control': 'no-cache'
+      }
     });
   }
 }

@@ -31,10 +31,15 @@ export async function onRequest(context) {
       newResponseHeaders.set('Access-Control-Allow-Origin', '*');
       newResponseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
       newResponseHeaders.set('Access-Control-Allow-Headers', 'Content-Type');
+      newResponseHeaders.set('Access-Control-Max-Age', '0');
       
       // Disable caching for real-time requests
       newResponseHeaders.set('Cache-Control', 'no-store');
-      
+
+      // Remove cookie headers for security
+      newResponseHeaders.delete('Set-Cookie');
+      newResponseHeaders.delete('Cookie');
+
       // Create a new response with the same body and headers
       const newResponse = new Response(originalResponseClone.body, {
         status: response.status,

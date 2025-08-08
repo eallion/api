@@ -30,8 +30,16 @@ export async function onRequest(context) {
       
       // Set CORS headers
       newResponseHeaders.set('Access-Control-Allow-Origin', '*');
-      newResponseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
       newResponseHeaders.set('Access-Control-Allow-Headers', 'Content-Type');
+      newResponseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      newResponseHeaders.set('Access-Control-Max-Age', '604800');
+
+      // Disable caching for real-time requests
+      newResponseHeaders.set('Cache-Control', 'max-age=604800, s-maxage=604800, stale-while-revalidate');
+
+      // Remove cookie headers for security
+      newResponseHeaders.delete('Set-Cookie');
+      newResponseHeaders.delete('Cookie');
       
       // Ensure the response is treated as an image
       newResponseHeaders.set('Content-Type', 'image/png');
@@ -48,14 +56,24 @@ export async function onRequest(context) {
       // Handle fetch errors
       return new Response(`Error fetching favicon: ${error.message}`, {
         status: 500,
-        headers: { 'Content-Type': 'text/plain' },
+        headers: {
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store',
+          'Access-Control-Max-Age': '0'
+        },
       });
     }
   } catch (error) {
     // Handle URL parsing errors
     return new Response(`Invalid request: ${error.message}`, {
       status: 400,
-      headers: { 'Content-Type': 'text/plain' },
+      headers: {
+        'Content-Type': 'text/plain',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store',
+        'Access-Control-Max-Age': '0'
+      },
     });
   }
 }

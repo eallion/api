@@ -37,7 +37,8 @@ export async function onRequest({ request }) {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store'
+          'Cache-Control': 'no-store',
+          'Access-Control-Max-Age': '0'
         }
       });
     }
@@ -46,7 +47,9 @@ export async function onRequest({ request }) {
     return new Response(clientIP, {
       headers: {
         'Content-Type': 'text/plain;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store',
+        'Access-Control-Max-Age': '0'
       }
     });
   } catch (error) {
@@ -66,7 +69,9 @@ export async function onRequest({ request }) {
         status: 500,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store',
+          'Access-Control-Max-Age': '0'
         }
       });
     }
@@ -76,7 +81,9 @@ export async function onRequest({ request }) {
       status: 500,
       headers: {
         'Content-Type': 'text/plain;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store',
+        'Access-Control-Max-Age': '0'
       }
     });
   }

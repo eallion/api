@@ -35,9 +35,10 @@ export async function onRequest(context) {
       newResponseHeaders.set('access-control-allow-origin', '*');
       newResponseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
       newResponseHeaders.set('Access-Control-Allow-Headers', 'Content-Type');
+      newResponseHeaders.set('Access-Control-Max-Age', '31536000');
       
       // Set cache control headers
-      newResponseHeaders.set('Cache-Control', 'max-age=600, s-maxage=2592000, stale-while-revalidate');
+      newResponseHeaders.set('Cache-Control', 'max-age=31536000, s-maxage=31536000, stale-while-revalidate');
       
       // Create a new response with the same body and headers
       const newResponse = new Response(originalResponseClone.body, {

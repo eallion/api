@@ -132,7 +132,7 @@ export async function onRequest(context) {
     // 设置动态缓存策略
     // 今日图片：缓存 1 小时（3600 秒），历史图片：缓存 30 天（2592000 秒）
     const cacheAge = isHistorical ? 2592000 : 3600;
-    const cacheControl = `public, max-age=600, s-maxage=${cacheAge}, stale-while-revalidate`;
+    const cacheControl = `public, max-age=3600, s-maxage=${cacheAge}, stale-while-revalidate`;
     
     // 如果 type=image，直接返回图片
     if (params.type === 'image') {
@@ -142,9 +142,13 @@ export async function onRequest(context) {
         
         // 设置缓存和 CORS 头部
         headers.set('Cache-Control', cacheControl);
-        headers.set('access-control-allow-origin', '*');
+        headers.set('Access-Control-Allow-Origin', '*');
         headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         headers.set('Access-Control-Allow-Headers', 'Content-Type');
+        headers.set('Content-Type', 'image/jpeg');
+        headers.set('Access-Control-Max-Age', '3600');
+        headers.delete('Set-Cookie');
+        headers.delete('Cookie');
         
         return new Response(imageResponse.body, {
           status: imageResponse.status,
@@ -155,8 +159,9 @@ export async function onRequest(context) {
           status: 404,
           headers: {
             'Content-Type': 'application/json',
-            'access-control-allow-origin': '*',
-            'Cache-Control': 'no-store, max-age=0' // 错误响应不缓存
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'no-store, max-age=0',
+            'Access-Control-Max-Age': '0'
           }
         });
       }
@@ -165,8 +170,9 @@ export async function onRequest(context) {
       return new Response(JSON.stringify(result), {
         headers: {
           'Content-Type': 'application/json',
-          'access-control-allow-origin': '*',
-          'Cache-Control': cacheControl
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': cacheControl,
+          'Access-Control-Max-Age': '3600'
         }
       });
     }
@@ -176,8 +182,9 @@ export async function onRequest(context) {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
-        'access-control-allow-origin': '*',
-        'Cache-Control': 'no-store, max-age=0'
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store, max-age=0',
+        'Access-Control-Max-Age': '0'
       }
     });
   }

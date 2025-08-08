@@ -22,6 +22,8 @@ export async function onRequest() {
     const endpointsInfo = {
       "/bing": {
         endpoint: "https://api.eallion.com/bing",
+        sample: "https://api.eallion.com/bing?type=image",
+        docs: "https://github.com/eallion/bing-php-api",
         parameters: {
           "type": "image",
           "region": [
@@ -34,21 +36,21 @@ export async function onRequest() {
             "1920x1080", "1366x768", "1280x768", "1280x720", "1024x768", "800x600", 
             "800x480", "768x1280", "720x1280", "640x480", "480x800", "400x240", "320x240", "240x320"
           ]
-        },
-        sample: "https://api.eallion.com/bing?type=image",
-        docs: "https://github.com/eallion/bing-php-api"
+        }
       },
       "/favicon": {
         endpoint: "https://api.eallion.com/favicon",
+        sample: "https://api.eallion.com/favicon?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url=https://www.eallion.com",
+        docs: "Redirect to t3.gstatic.cn",
         parameters: {
           "size": ["128", "64", "32", "16"],
           "url": "https://www.eallion.com"
-        },
-        sample: "https://api.eallion.com/favicon?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url=https://www.eallion.com",
-        docs: "Redirect to t3.gstatic.cn"
+        }
       },
       "/geo": {
         endpoint: "https://api.eallion.com/geo",
+        sample: "https://api.eallion.com/geo?key=countryName&type=json",
+        docs: "https://cloud.tencent.com/document/product/1552/107291",
         parameters: {
           "key": [
             "ip", "asn", "countryName", "countryCodeAlpha2", "countryCodeAlpha3", 
@@ -56,28 +58,28 @@ export async function onRequest() {
             "latitude", "longitude"
           ],
           "type": "json"
-        },
-        sample: "https://api.eallion.com/geo?key=countryName&type=json",
-        docs: "https://cloud.tencent.com/document/product/1552/107291"
+        }
       },
       "/gravatar": {
         endpoint: "https://api.eallion.com/gravatar",
+        sample: "https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31",
+        docs: "https://wiki.libravatar.org/description/",
         parameters: {
           "md5": "171e4c30959e8c077a6c58b958624b31"
-        },
-        sample: "https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31",
-        docs: "https://wiki.libravatar.org/description/"
+        }
       },
       "/ip": {
         endpoint: "https://api.eallion.com/ip",
+        sample: "https://api.eallion.com/ip",
+        docs: "https://cloud.tencent.com/document/product/1552/101774",
         parameters: {
           "type": ["json", "all"]
-        },
-        sample: "https://api.eallion.com/ip",
-        docs: "https://cloud.tencent.com/document/product/1552/101774"
+        }
       },
       "/mastodon": {
         endpoint: "https://api.eallion.com/mastodon",
+        sample: "https://api.eallion.com/mastodon?limit=20&exclude_replies=true&exclude_reblogs=true",
+        docs: "https://docs.joinmastodon.org/methods/statuses/",
         parameters: {
           "limit": 40,
           "exclude_replies": true,
@@ -88,12 +90,12 @@ export async function onRequest() {
           "since_id": "String",
           "pinned": false,
           "tagged": "String"
-        },
-        sample: "https://api.eallion.com/mastodon?limit=20&exclude_replies=true&exclude_reblogs=true",
-        docs: "https://docs.joinmastodon.org/methods/statuses/"
+        }
       },
       "/memos": {
         endpoint: "https://api.eallion.com/memos",
+        sample: "https://api.eallion.com/memos?parent=users/101&pageSize=10",
+        docs: "https://memos.apidocumentation.com/reference",
         parameters: {
           "pageSize": 10,
           "pageToken": "Optional",
@@ -101,17 +103,15 @@ export async function onRequest() {
           "orderBy": "Optional",
           "showDeleted": "Optional",
           "filter": "Optional"
-        },
-        sample: "https://api.eallion.com/memos?parent=users/101&pageSize=10",
-        docs: "https://memos.apidocumentation.com/reference"
+        }
       },
       "/og": {
         endpoint: "https://api.eallion.com/og",
+        sample: "https://api.eallion.com/og?title=大大的小蜗牛",
+        docs: "https://www.eallion.com/og-image-api/",
         parameters: {
           "title": "String"
-        },
-        sample: "https://api.eallion.com/og?title=大大的小蜗牛",
-        docs: "https://www.eallion.com/og-image-api/"
+        }
       }
     };
     
@@ -147,7 +147,7 @@ export async function onRequest() {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'no-store'
+        'Cache-Control': '86400'
       }
     });
   } catch (error) {
@@ -173,6 +173,8 @@ export async function onRequest() {
     const endpointsInfo = {
       "/bing": {
         endpoint: "https://api.eallion.com/bing",
+        sample: "https://api.eallion.com/bing?type=image",
+        docs: "https://github.com/eallion/bing-php-api",
         parameters: {
           "type": "image",
           "region": [
@@ -185,21 +187,21 @@ export async function onRequest() {
             "1920x1080", "1366x768", "1280x768", "1280x720", "1024x768", "800x600", 
             "800x480", "768x1280", "720x1280", "640x480", "480x800", "400x240", "320x240", "240x320"
           ]
-        },
-        sample: "https://api.eallion.com/bing?type=image",
-        docs: "https://github.com/eallion/bing-php-api"
+        }
       },
       "/favicon": {
         endpoint: "https://api.eallion.com/favicon",
+        sample: "https://api.eallion.com/favicon?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url=https://www.eallion.com",
+        docs: "Redirect to t3.gstatic.cn",
         parameters: {
           "size": ["128", "64", "32", "16"],
           "url": "https://www.eallion.com"
-        },
-        sample: "https://api.eallion.com/favicon?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url=https://www.eallion.com",
-        docs: "Redirect to t3.gstatic.cn"
+        }
       },
       "/geo": {
         endpoint: "https://api.eallion.com/geo",
+        sample: "https://api.eallion.com/geo?key=countryName&type=json",
+        docs: "https://cloud.tencent.com/document/product/1552/107291",
         parameters: {
           "key": [
             "ip", "asn", "countryName", "countryCodeAlpha2", "countryCodeAlpha3", 
@@ -207,28 +209,28 @@ export async function onRequest() {
             "latitude", "longitude"
           ],
           "type": "json"
-        },
-        sample: "https://api.eallion.com/geo?key=countryName&type=json",
-        docs: "https://cloud.tencent.com/document/product/1552/107291"
+        }
       },
       "/gravatar": {
         endpoint: "https://api.eallion.com/gravatar",
+        sample: "https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31",
+        docs: "https://wiki.libravatar.org/description/",
         parameters: {
           "md5": "171e4c30959e8c077a6c58b958624b31"
-        },
-        sample: "https://api.eallion.com/gravatar/171e4c30959e8c077a6c58b958624b31",
-        docs: "https://wiki.libravatar.org/description/"
+        }
       },
       "/ip": {
         endpoint: "https://api.eallion.com/ip",
+        sample: "https://api.eallion.com/ip",
+        docs: "https://cloud.tencent.com/document/product/1552/101774",
         parameters: {
           "type": ["json", "all"]
-        },
-        sample: "https://api.eallion.com/ip",
-        docs: "https://cloud.tencent.com/document/product/1552/101774"
+        }
       },
       "/mastodon": {
         endpoint: "https://api.eallion.com/mastodon",
+        sample: "https://api.eallion.com/mastodon?limit=20&exclude_replies=true&exclude_reblogs=true",
+        docs: "https://docs.joinmastodon.org/methods/statuses/",
         parameters: {
           "limit": 40,
           "exclude_replies": true,
@@ -239,12 +241,12 @@ export async function onRequest() {
           "since_id": "String",
           "pinned": false,
           "tagged": "String"
-        },
-        sample: "https://api.eallion.com/mastodon?limit=20&exclude_replies=true&exclude_reblogs=true",
-        docs: "https://docs.joinmastodon.org/methods/statuses/"
+        }
       },
       "/memos": {
         endpoint: "https://api.eallion.com/memos",
+        sample: "https://api.eallion.com/memos?parent=users/101&pageSize=10",
+        docs: "https://memos.apidocumentation.com/reference",
         parameters: {
           "pageSize": 10,
           "pageToken": "Optional",
@@ -252,17 +254,15 @@ export async function onRequest() {
           "orderBy": "Optional",
           "showDeleted": "Optional",
           "filter": "Optional"
-        },
-        sample: "https://api.eallion.com/memos?parent=users/101&pageSize=10",
-        docs: "https://memos.apidocumentation.com/reference"
+        }
       },
       "/og": {
         endpoint: "https://api.eallion.com/og",
+        sample: "https://api.eallion.com/og?title=大大的小蜗牛",
+        docs: "https://www.eallion.com/og-image-api/",
         parameters: {
           "title": "String"
-        },
-        sample: "https://api.eallion.com/og?title=大大的小蜗牛",
-        docs: "https://www.eallion.com/og-image-api/"
+        }
       }
     };
     
@@ -283,6 +283,7 @@ export async function onRequest() {
     }), {
       status: 500,
       headers: {
+        'Cache-Control': '86400',
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
