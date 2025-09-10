@@ -1,6 +1,13 @@
 {
   "name": "api-eallion-com",
   "nodeVersion": "22.11.0",
+  "routes": [
+    {
+      "pattern": "/gts/*",
+      "script": "functions/gts/[[path]].js",
+      "methods": ["GET", "POST", "PUT", "HEAD"]
+    }
+  ],
   "redirects": [
     {
       "source": "/memos/memos.json*",

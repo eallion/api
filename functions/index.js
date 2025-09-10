@@ -68,6 +68,19 @@ export async function onRequest() {
           "md5": "171e4c30959e8c077a6c58b958624b31"
         }
       },
+      "/gts": {
+        endpoint: "https://api.eallion.com/gts",
+        sample: "https://api.eallion.com/gts/eallion",
+        docs: "https://edgeone.cloud.tencent.com/pages/document/185234005644472320",
+        parameters: {
+          "admin": {
+            "key": "String (required)",
+            "value": "String (optional for DELETE)",
+            "token": "String (required)"
+          },
+          "methods": ["GET", "POST", "DELETE"]
+        }
+      },
       "/ip": {
         endpoint: "https://api.eallion.com/ip",
         sample: "https://api.eallion.com/ip",

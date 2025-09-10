@@ -75,7 +75,6 @@ export async function onRequest({ request }) {
             'Content-Type': 'application/json;charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Cache-Control': 'no-store',
-            'Cache-Control': 'no-store',
             'Access-Control-Max-Age': '0'
           }
         });
@@ -106,7 +105,6 @@ export async function onRequest({ request }) {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store',
           'Cache-Control': 'no-store',
           'Access-Control-Max-Age': '0'
         }
@@ -156,7 +154,6 @@ export async function onRequest({ request }) {
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'no-store',
         'Cache-Control': 'no-store',
         'Access-Control-Max-Age': '0'
       }
