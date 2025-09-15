@@ -125,6 +125,14 @@ export async function onRequest() {
         parameters: {
           "title": "String"
         }
+      },
+      "/translate": {
+        endpoint: "https://api.eallion.com/translate",
+        sample: "https://api.eallion.com/translate?slug=标题示例",
+        docs: "https://docs.caiyunapp.com/lingocloud-api/index.html",
+        parameters: {
+          "slug": "String (required)"
+        }
       }
     };
     
@@ -275,6 +283,14 @@ export async function onRequest() {
         docs: "https://www.eallion.com/og-image-api/",
         parameters: {
           "title": "String"
+        }
+      },
+      "/translate": {
+        endpoint: "https://api.eallion.com/translate",
+        sample: "https://api.eallion.com/translate?slug=标题示例",
+        docs: "https://docs.caiyunapp.com/lingocloud-api/index.html",
+        parameters: {
+          "slug": "String (required)"
         }
       }
     };

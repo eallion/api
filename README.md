@@ -36,10 +36,13 @@
 
 2. **管理接口**：
    - 设置键值对（通过 URL 参数）：
+
      ```
      POST /gts/admin?key=test&value=valuetest&token=your_api_token
      ```
+
    - 设置键值对（通过请求体，推荐）：
+
      ```
      curl -X POST \
        https://your-domain.com/gts/admin \
@@ -47,7 +50,9 @@
        -H "Content-Type: application/json" \
        -d '{"key": "test-key", "value": "test-value"}'
      ```
+
    - 删除键值对：
+
      ```
      curl -X DELETE \
        "https://your-domain.com/gts/admin?key=test-key" \
@@ -74,26 +79,59 @@
 
 代理访问 `https://og.eallion.com/api/og` 获取 OG 图片。
 
+### /translate
+
+使用彩云翻译 API 实现中文到英文的实时翻译。
+
+请求示例：
+
+```
+GET /translate?slug=标题示例
+```
+
+响应示例：
+
+```json
+{
+  "status": "success",
+  "slug": "标题示例",
+  "translated": "title-example",
+  "timestamp": "2023-04-01T12:00:00.000Z"
+}
+```
+
+环境变量配置：
+
+- `CAIYUN_TOKEN`: 彩云翻译 API Token
+
 ## 部署要求
 
 1. 在腾讯云 EdgeOne Pages 中配置以下环境变量：
    - `API_TOKEN`: 设置您的管理令牌
+   - `CAIYUN_TOKEN`: 彩云翻译 API Token
    - 绑定 KV 存储并命名为 `goto_gts` (或修改代码使用其他名称)
 
 2. 确保 edgeone.json 配置正确，包含以下路由：
+
    ```json
    "routes": [
      {
        "pattern": "/gts/*",
        "script": "functions/gts/[[path]].js",
        "methods": ["GET", "POST", "PUT", "DELETE", "HEAD"]
+     },
+     {
+       "pattern": "/translate",
+       "script": "functions/translate/index.js",
+       "methods": ["GET"]
      }
    ]
    ```
 
 3. 部署后测试：
    - 测试短链接功能: `GET /gts/test`
-   - 测试管理接口: 
+   - 测试管理接口:
+
      ```bash
      curl -X POST "http://your-domain/gts/admin?key=test&value=example&token=your_token"
      curl -X DELETE "http://your-domain/gts/admin?key=test&token=your_token"

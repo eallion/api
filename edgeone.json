@@ -6,6 +6,11 @@
       "pattern": "/gts/*",
       "script": "functions/gts/[[path]].js",
       "methods": ["GET", "POST", "PUT", "HEAD"]
+    },
+    {
+      "pattern": "/translate",
+      "script": "functions/translate/index.js",
+      "methods": ["GET"]
     }
   ],
   "redirects": [
