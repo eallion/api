@@ -8,6 +8,11 @@
       "methods": ["GET", "POST", "PUT", "HEAD"]
     },
     {
+      "pattern": "/lol/*",
+      "script": "functions/lol/[[path]].js",
+      "methods": ["GET"]
+    },
+    {
       "pattern": "/translate",
       "script": "functions/translate/index.js",
       "methods": ["GET"]
@@ -121,10 +126,28 @@
           }
         ]
       }
+    ,
+      {
+        "source": "/lol*",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          }
+        ]
+      }
     ],
   "cache": [
     {
       "source": "/bing*",
+      "cacheTtl": 3600
+    },
+    {
+      "source": "/lol*",
       "cacheTtl": 3600
     },
     {

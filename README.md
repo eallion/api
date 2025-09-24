@@ -67,6 +67,28 @@
 
 返回客户端的公网 IP 地址。
 
+### /lol
+
+代理访问英雄数据并将 `hero` 字段转换为 Directus 自动完成可用的数组格式。
+
+示例：`GET /lol/163.js` → 代理到 `https://game.gtimg.cn/images/lol/act/img/js/hero/163.js`，返回 JSON，`hero` 为数组，示例：
+
+```json
+{
+  "file": "https://game.gtimg.cn/images/lol/act/img/js/hero/163.js",
+  "hero": [
+    {
+      "id": "163",
+      "title": "岩雀",
+      "heroId": "163",
+      "name": "岩雀",
+      "alias": "Taliyah",
+      ...
+    }
+  ]
+}
+```
+
 ### /mastodon
 
 代理访问 `https://e5n.cc/api/v1/accounts/111136231674527355/statuses` 获取 Mastodon 状态。

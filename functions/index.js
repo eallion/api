@@ -89,6 +89,14 @@ export async function onRequest() {
           "type": ["json", "all"]
         }
       },
+      "/lol": {
+        endpoint: "https://api.eallion.com/lol/{id}.js",
+        sample: "https://api.eallion.com/lol/11.js",
+        docs: "https://lol.qq.com/cguide/Guide/PublicResources/APIs.html",
+        parameters: {
+          "id": "英雄 ID (例如 11)"
+        }
+      },
       "/mastodon": {
         endpoint: "https://api.eallion.com/mastodon",
         sample: "https://api.eallion.com/mastodon?limit=20&exclude_replies=true&exclude_reblogs=true",
