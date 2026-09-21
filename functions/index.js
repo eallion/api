@@ -25,7 +25,7 @@ export async function onRequest() {
         sample: "https://api.eallion.com/bing?type=image",
         docs: "https://github.com/eallion/bing-php-api",
         parameters: {
-          "type": "image",
+          "type": ["json", "image"],
           "region": [
             "zh-CN", "en-US", "ja-JP", "en-AU", "en-UK", "de-DE", "en-NZ", "en-CA"
           ],
@@ -205,7 +205,7 @@ export async function onRequest() {
         sample: "https://api.eallion.com/bing?type=image",
         docs: "https://github.com/eallion/bing-php-api",
         parameters: {
-          "type": "image",
+          "type": ["json", "image"],
           "region": [
             "zh-CN", "en-US", "ja-JP", "en-AU", "en-UK", "de-DE", "en-NZ", "en-CA"
           ],

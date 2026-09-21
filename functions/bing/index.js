@@ -9,11 +9,11 @@ const dpis = {
   '1080p': '1920x1080',
   '1080i': '1920x1080',
   'hd': '1920x1080',
-  'uhd': '1920x1080',
+  'uhd': 'UHD',
   '2k': '1920x1080',
   '2.5k': '1920x1200',
   '2.8k': '1920x1200',
-  '4k': '1920x1080',
+  '4k': 'UHD',
   'm': '720x1280',
   'small': '1280x720',
   'thumbnail': '320x240',
@@ -38,6 +38,7 @@ const dpis = {
 
 // 格式化日期函数
 function dateFormat(date) {
+  if (!date || date.length < 8) return date || '';
   let formattedDate = date.substring(0, 4) + '-' + date.substring(4);
   formattedDate = formattedDate.substring(0, 7) + '-' + formattedDate.substring(7);
   return formattedDate;
@@ -48,7 +49,6 @@ async function getBingWallpaper(params) {
   const region = params.region || 'en-US';
   const date = params.date || null;
   const dpi = params.dpi || null;
-  const type = params.type || null;
   
   // 计算天数差
   let day = 0;
@@ -58,15 +58,6 @@ async function getBingWallpaper(params) {
     const timeDiff = Math.abs(currentDate.getTime() - targetDate.getTime());
     day = Math.floor(timeDiff / (1000 * 3600 * 24));
   }
-  
-  // 初始化返回信息
-  const info = {
-    startdate: '',
-    enddate: '',
-    title: '',
-    copyright: '',
-    cover: []
-  };
   
   // 验证区域参数
   const mkt = regions.includes(region) ? region : 'en-US';
@@ -78,30 +69,53 @@ async function getBingWallpaper(params) {
     // 发起请求
     const response = await fetch(url);
     const data = await response.json();
-    const image = data.images[0];
+    const image = data.images && data.images[0];
     
-    // 填充信息
-    info.startdate = dateFormat(image.startdate);
-    info.enddate = dateFormat(image.enddate);
-    info.title = image.title;
-    info.copyright = image.copyright;
-    info.redirect = `${BING}${image.urlbase}_1920x1080.jpg`;
-    info.cover = [];
-    
-    // 处理不同分辨率
-    for (const [key, value] of Object.entries(dpis)) {
-      const cover = `${BING}${image.urlbase}_${value}.jpg`;
-      if (dpi === key) {
-        info.redirect = cover;
-      }
-      info.cover.push(cover);
+    if (!image) {
+      return { error: 'No image found from upstream API' };
     }
-    
-    // 如果没有 type 参数，删除 redirect 字段
-    if (!type) {
-      delete info.redirect;
+
+    // 格式化相关链接（若为相对路径则补全必应主域名）
+    let copyrightlink = image.copyrightlink || '';
+    if (copyrightlink && copyrightlink.startsWith('/')) {
+      copyrightlink = `${BING}${copyrightlink}`;
     }
-    
+
+    let quiz = image.quiz || '';
+    if (quiz && quiz.startsWith('/')) {
+      quiz = `${BING}${quiz}`;
+    }
+
+    // 处理指定分辨率 direct 图片链接
+    let redirect = `${BING}${image.urlbase}_1920x1080.jpg`;
+    if (dpi && dpis[dpi]) {
+      redirect = `${BING}${image.urlbase}_${dpis[dpi]}.jpg`;
+    }
+
+    // 生成所有可用分辨率的封面数组（去重）
+    const coverSet = new Set();
+    for (const value of Object.values(dpis)) {
+      coverSet.add(`${BING}${image.urlbase}_${value}.jpg`);
+    }
+
+    // 组装完整的必应壁纸数据
+    const info = {
+      title: image.title || '',
+      headline: image.headline || '',
+      copyright: image.copyright || '',
+      copyrightlink: copyrightlink,
+      startdate: dateFormat(image.startdate),
+      fullstartdate: image.fullstartdate || '',
+      enddate: dateFormat(image.enddate),
+      url: `${BING}${image.url}`,
+      urlbase: `${BING}${image.urlbase}`,
+      redirect: redirect,
+      quiz: quiz,
+      wp: typeof image.wp === 'boolean' ? image.wp : true,
+      hsh: image.hsh || '',
+      cover: Array.from(coverSet)
+    };
+
     return info;
   } catch (error) {
     console.error('Error fetching Bing image:', error);
@@ -125,6 +139,18 @@ export async function onRequest(context) {
   try {
     // 获取 Bing 壁纸数据
     const result = await getBingWallpaper(params);
+
+    if (result.error && !result.redirect) {
+      return new Response(JSON.stringify({ error: result.error }, null, 2), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store, max-age=0',
+          'Access-Control-Max-Age': '0'
+        }
+      });
+    }
     
     // 判断是否为历史图片（根据是否传入 date 参数）
     const isHistorical = !!params.date;
@@ -155,10 +181,10 @@ export async function onRequest(context) {
           headers: headers
         });
       } else {
-        return new Response(JSON.stringify({ error: 'Image URL not found' }), {
+        return new Response(JSON.stringify({ error: 'Image URL not found' }, null, 2), {
           status: 404,
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Cache-Control': 'no-store, max-age=0',
             'Access-Control-Max-Age': '0'
@@ -166,11 +192,13 @@ export async function onRequest(context) {
         });
       }
     } else {
-      // 返回 JSON 格式结果
-      return new Response(JSON.stringify(result), {
+      // 返回完整 JSON 格式结果（美化输出）
+      return new Response(JSON.stringify(result, null, 2), {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
           'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
           'Cache-Control': cacheControl,
           'Access-Control-Max-Age': '3600'
         }
@@ -178,10 +206,10 @@ export async function onRequest(context) {
     }
   } catch (error) {
     // 错误响应不缓存
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error.message }, null, 2), {
       status: 500,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
         'Cache-Control': 'no-store, max-age=0',
         'Access-Control-Max-Age': '0'

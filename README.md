@@ -14,6 +14,14 @@
 
 代理访问必应每日壁纸数据。
 
+- **返回完整壁纸元数据（JSON）**：`GET /bing` 或 `GET /bing?type=json`（包含 `title`、`copyright`、`copyrightlink`、`quiz`、`startdate`、`enddate`、`url`、`redirect`、`cover` 等完整字段）
+- **直接返回壁纸图片**：`GET /bing?type=image`
+- **支持参数**：
+  - `type`: `json`（默认）或 `image`
+  - `region`: 区域代码，如 `zh-CN`, `en-US`, `ja-JP` 等，默认为 `en-US`
+  - `date`: 指定历史日期，格式 `YYYY-MM-DD`（支持最近约 8 天壁纸）
+  - `dpi`: 指定分辨率或直链规格，支持 `uhd`, `1080p`, `720p`, `mobile` 等，默认为 `1920x1080`
+
 ### /favicon
 
 代理访问 `https://t3.gstatic.cn/faviconV2` 获取网站图标。

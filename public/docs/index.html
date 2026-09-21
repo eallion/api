@@ -41,9 +41,8 @@
           <tbody>
             <tr>
               <td><code>type</code></td>
-              <td><a href='https://api.eallion.com/bing?type=image' target="_blank"><span>type=image</span></a></td>
-              <td><span>当该字段等于
-                </span><code>image</code><span>时，返回参数会新增一个</span><code>redirect</code><span>值为壁纸的地址，同时直接返回图片</span></td>
+              <td><a href='https://api.eallion.com/bing' target="_blank"><span>/bing</span></a><br /><a href='https://api.eallion.com/bing?type=json' target="_blank"><span>type=json</span></a><br /><a href='https://api.eallion.com/bing?type=image' target="_blank"><span>type=image</span></a></td>
+              <td><span>可选 <code>json</code>（默认）或 <code>image</code>。当为 <code>image</code> 时，直接返回壁纸图片；当为 <code>json</code> 或不传参数时，返回包含标题（title）、版权（copyright/copyrightlink）、问答（quiz）、全部分辨率直链等完整元数据的 JSON。</span></td>
             </tr>
             <tr>
               <td><code>region</code></td>

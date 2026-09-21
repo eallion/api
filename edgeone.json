@@ -117,10 +117,6 @@
         "source": "/bing*",
         "headers": [
           {
-            "key": "Content-Type",
-            "value": "image/jpeg"
-          },
-          {
             "key": "Cache-Control",
             "value": "public, max-age=3600"
           }
