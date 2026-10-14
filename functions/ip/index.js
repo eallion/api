@@ -123,48 +123,6 @@ function getIpPageHtml() {
 </html>`;
 }
 
-/**
- * 回落请求专用单栈端点，获取指定协议版本的 IP 地址
- */
-async function fetchFallbackIp(targetUrl) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 4000);
-  try {
-    const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'curl/8.0'
-      },
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (!response.ok) return null;
-
-    const text = (await response.text()).trim();
-
-    // 尝试解析 JSON 格式
-    try {
-      const data = JSON.parse(text);
-      if (data && typeof data.ip === 'string') {
-        return data.ip.trim();
-      }
-    } catch {
-      // 非 JSON 格式直接提取文本
-    }
-
-    // 正则匹配合法 IPv4 地址
-    const ipv4Match = text.match(/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/);
-    if (ipv4Match) return ipv4Match[0];
-
-    // 正则匹配合法 IPv6 地址
-    const ipv6Match = text.match(/(?:[a-fA-F0-9]{1,4}:){1,7}[a-fA-F0-9]{1,4}|::1|::/);
-    if (ipv6Match) return ipv6Match[0];
-
-    return text.split('\n')[0].trim() || null;
-  } catch {
-    clearTimeout(timeoutId);
-    return null;
-  }
-}
 
 export async function onRequest({ request }) {
   const commonHeaders = {
@@ -198,9 +156,18 @@ export async function onRequest({ request }) {
     const ipProtocol = ipInfo.type === 'IPv6' ? 'IPv6' : 'IPv4';
 
     // 判断是否优先返回 Web UI 页面：
-    // 1. 显式指定 type=html 或 format=html
-    // 2. 客户端请求头 Accept 包含 text/html 且未显式指定 type=json 或 type=text (浏览器访问)
-    const isHtmlRequest = type === 'html' || (type !== 'json' && type !== 'text' && !key && acceptHeader.includes('text/html'));
+    // 仅当显式指定 type=html，或者在无任何功能性查询参数且 Accept 包含 text/html（浏览器默认访问）时返回 Web UI
+    const hasApiParams = url.searchParams.has('v') || 
+                         url.searchParams.has('version') || 
+                         url.searchParams.has('key') || 
+                         url.searchParams.has('cn') || 
+                         url.searchParams.has('oversea') || 
+                         url.searchParams.has('source') || 
+                         url.searchParams.has('region') ||
+                         url.searchParams.has('type') ||
+                         url.searchParams.has('format');
+
+    const isHtmlRequest = type === 'html' || (!hasApiParams && acceptHeader.includes('text/html'));
 
     if (isHtmlRequest) {
       return new Response(getIpPageHtml(), {
@@ -214,39 +181,30 @@ export async function onRequest({ request }) {
     // 判断请求是否期望 JSON 格式
     const wantsJson = type === 'json' || type === 'all' || acceptHeader.includes('application/json');
 
-    // 检查指定的 IP 版本校验与回落处理（如 ?v=4 或 ?v=6）
+    // 解析分流参数（cn / oversea）
+    const wantsOversea = url.searchParams.has('oversea') || 
+                         url.searchParams.get('source') === 'oversea' || 
+                         url.searchParams.get('region') === 'oversea';
+    const wantsCn = url.searchParams.has('cn') || 
+                    url.searchParams.get('source') === 'cn' || 
+                    url.searchParams.get('region') === 'cn';
+    const requestedRegion = wantsOversea ? 'oversea' : (wantsCn ? 'cn' : null);
+
+    const clientCountry = geoInfo.countryCodeAlpha2 || request.headers.get('eo-client-ipcountry') || 'Unknown';
+    const isDomestic = clientCountry === 'CN';
+    const clientRegion = isDomestic ? 'cn' : 'oversea';
+
+    // 检查指定的 IP 版本校验（如 ?v=4 或 ?v=6）
     if (versionParam) {
       const expectedVersion = parseInt(versionParam, 10);
       if (expectedVersion === 4 || expectedVersion === 6) {
-        // 当前连接协议与请求的版本不匹配时，触发回落机制
+        // 当前连接协议与请求的版本不匹配时，返回 400 协议不匹配错误，绝不重定向，绝不伪造机房出口 IP
         if (ipInfo.version !== expectedVersion) {
-          // 判断回落数据源（支持 cn 与 oversea）
-          let fallbackSource = 'cn';
-          if (url.searchParams.has('oversea') || 
-              url.searchParams.get('source') === 'oversea' || 
-              url.searchParams.get('region') === 'oversea') {
-            fallbackSource = 'oversea';
-          } else if (url.searchParams.has('cn') || 
-                     url.searchParams.get('source') === 'cn' || 
-                     url.searchParams.get('region') === 'cn') {
-            fallbackSource = 'cn';
-          }
-
-          // 匹配目标专用单栈端点
-          let fallbackUrl;
-          if (expectedVersion === 4) {
-            fallbackUrl = fallbackSource === 'oversea'
-              ? 'https://api-ipv4.ip.sb/ip'
-              : 'https://v4.yinghualuo.cn/bejson';
-          } else {
-            fallbackUrl = fallbackSource === 'oversea'
-              ? 'https://api-ipv6.ip.sb/ip'
-              : 'https://v6.yinghualuo.cn/bejson';
-          }
-
-          // 检查是否显式要求重定向模式 (?mode=redirect 或 ?redirect)
-          const isRedirectMode = url.searchParams.get('mode') === 'redirect' || url.searchParams.has('redirect');
+          const isRedirectMode = url.searchParams.get('mode') === 'redirect';
           if (isRedirectMode) {
+            const fallbackUrl = expectedVersion === 4
+              ? (requestedRegion === 'oversea' ? 'https://api-ipv4.ip.sb/ip' : 'https://v4.yinghualuo.cn/bejson')
+              : (requestedRegion === 'oversea' ? 'https://api-ipv6.ip.sb/ip' : 'https://v6.yinghualuo.cn/bejson');
             return new Response(`Redirecting to IPv${expectedVersion} endpoint: ${fallbackUrl}\n`, {
               status: 302,
               headers: {
@@ -257,87 +215,23 @@ export async function onRequest({ request }) {
             });
           }
 
-          // 显式指定 mode=fetch 或 mode=proxy 时，由边缘节点代为向第三方发起请求（返回边缘节点公网出口 IP）
-          const isProxyFetch = url.searchParams.get('mode') === 'fetch' || url.searchParams.get('mode') === 'proxy';
-          if (isProxyFetch) {
-            const fallbackIp = await fetchFallbackIp(fallbackUrl);
-            if (!fallbackIp) {
-              const failMessage = `Protocol mismatch: connected via ${ipInfo.type}, fallback to IPv${expectedVersion} (${fallbackSource}) failed`;
-              if (wantsJson) {
-                return new Response(JSON.stringify({
-                  status: 'error',
-                  code: 502,
-                  message: failMessage,
-                  timestamp: Date.now()
-                }, null, 2), {
-                  status: 502,
-                  headers: {
-                    ...commonHeaders,
-                    'Content-Type': 'application/json;charset=UTF-8'
-                  }
-                });
-              }
-              return new Response(`Error: ${failMessage}\n`, {
-                status: 502,
-                headers: {
-                  ...commonHeaders,
-                  'Content-Type': 'text/plain;charset=UTF-8'
-                }
-              });
-            }
-
-            if (wantsJson) {
-              return new Response(JSON.stringify({
-                status: 'success',
-                code: 200,
-                data: {
-                  ip: fallbackIp,
-                  protocol: expectedVersion === 6 ? 'IPv6' : 'IPv4',
-                  version: expectedVersion,
-                  type: expectedVersion === 6 ? 'IPv6' : 'IPv4',
-                  isIPv4: expectedVersion === 4,
-                  isIPv6: expectedVersion === 6,
-                  source: fallbackSource,
-                  fallback: true,
-                  timestamp: Date.now()
-                }
-              }, null, 2), {
-                headers: {
-                  ...commonHeaders,
-                  'Content-Type': 'application/json;charset=UTF-8'
-                }
-              });
-            }
-
-            return new Response(fallbackIp, {
-              headers: {
-                ...commonHeaders,
-                'Content-Type': 'text/plain;charset=UTF-8'
-              }
-            });
-          }
-
-          // 默认情况（不跳转）：返回明确的协议不匹配及终端正确获取本机真实 IP 的指引
           const mismatchMessage = `Protocol mismatch: connected via ${ipInfo.type}, but requested IPv${expectedVersion}.`;
           const guideMessage = `Over an ${ipInfo.type} connection, EdgeOne cannot detect your local machine's IPv${expectedVersion} without redirection.\n` +
-            `To get your real IPv${expectedVersion} without redirection:\n` +
-            `  curl -${expectedVersion} https://api.eallion.com/ip\n` +
-            `To allow redirecting to dedicated single-stack endpoint:\n` +
-            `  curl -L "https://api.eallion.com/ip?v=${expectedVersion}&mode=redirect"\n` +
-            `To view in browser with automatic local probing:\n` +
-            `  Open https://api.eallion.com/ip?v=${expectedVersion} in your browser`;
+            `To query your local IPv${expectedVersion} directly without redirection:\n` +
+            `  curl -${expectedVersion} https://api.eallion.com/ip`;
 
           if (wantsJson) {
             return new Response(JSON.stringify({
               status: 'error',
               code: 400,
               message: mismatchMessage,
-              hint: `Run 'curl -${expectedVersion} https://api.eallion.com/ip' to resolve local IPv${expectedVersion} directly without redirecting.`,
+              hint: `Run 'curl -${expectedVersion} https://api.eallion.com/ip' to query local IPv${expectedVersion} directly.`,
               client: {
                 ip: ipInfo.ip,
                 protocol: ipProtocol,
                 version: ipInfo.version,
-                type: ipInfo.type
+                type: ipInfo.type,
+                region: clientRegion
               },
               timestamp: Date.now()
             }, null, 2), {
@@ -383,6 +277,7 @@ export async function onRequest({ request }) {
       else if (key === 'type') keyValue = ipInfo.type;
       else if (key === 'isIPv4') keyValue = String(ipInfo.isIPv4);
       else if (key === 'isIPv6') keyValue = String(ipInfo.isIPv6);
+      else if (key === 'source' || key === 'region') keyValue = clientRegion;
       else if (Object.prototype.hasOwnProperty.call(geoData, key)) keyValue = String(geoData[key]);
 
       if (keyValue !== undefined) {
@@ -422,6 +317,9 @@ export async function onRequest({ request }) {
           type: ipInfo.type,
           isIPv4: ipInfo.isIPv4,
           isIPv6: ipInfo.isIPv6,
+          source: clientRegion,
+          region: clientRegion,
+          ...(requestedRegion ? { requestedRegion } : {}),
           geo: geoData,
           timestamp: Date.now()
         }

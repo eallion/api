@@ -178,17 +178,17 @@
             <tr>
               <td><code>v=4 / v=6</code></td>
               <td><a href='https://api.eallion.com/ip?v=4' target="_blank"><span>v=4</span></a><br /><a href='https://api.eallion.com/ip?v=4&amp;oversea' target="_blank"><span>v=4&amp;oversea</span></a><br /><a href='https://api.eallion.com/ip?v=6' target="_blank"><span>v=6</span></a></td>
-              <td><span>校验协议版本。<strong>浏览器访问完全不跳转</strong>，直接在页面内由本机发起异步探针并展示真实 IP。终端命令行访问时，若当前连接协议不匹配默认不跳转并给出 <code>curl -4</code> 原生指引；显式添加 <code>mode=redirect</code>（如 <code>curl -L "https://api.eallion.com/ip?v=4&amp;mode=redirect"</code>）可重定向至单栈目标。</span></td>
+              <td><span>协议版本校验。若当前连接协议与请求版本一致，直接返回纯文本 IP（或结合 <code>type=json</code> 返回 JSON）。若不一致，返回 400 错误且不跳转。终端可用 <code>curl -4</code> 或 <code>curl -6</code> 强制单栈握手。</span></td>
             </tr>
             <tr>
               <td><code>source / cn / oversea</code></td>
-              <td><a href='https://api.eallion.com/ip?v=4&amp;cn' target="_blank"><span>v=4&amp;cn</span></a><br /><a href='https://api.eallion.com/ip?v=4&amp;source=oversea' target="_blank"><span>source=oversea</span></a></td>
-              <td><span>指定回落数据源，可选 <code>cn</code>（国内单栈，默认）或 <code>oversea</code>（国际单栈）。可作为布尔标记（<code>?v=4&amp;cn</code>）或键值参数（<code>?v=4&amp;source=oversea</code>）。</span></td>
+              <td><a href='https://api.eallion.com/ip?v=4&amp;cn' target="_blank"><span>v=4&amp;cn</span></a><br /><a href='https://api.eallion.com/ip?v=6&amp;cn' target="_blank"><span>v=6&amp;cn</span></a><br /><a href='https://api.eallion.com/ip?v=4&amp;oversea' target="_blank"><span>v=4&amp;oversea</span></a><br /><a href='https://api.eallion.com/ip?v=6&amp;oversea' target="_blank"><span>v=6&amp;oversea</span></a></td>
+              <td><span>指定网络分流区域标记，可选 <code>cn</code> 或 <code>oversea</code>。配合 <code>v</code> 参数形成 4 种典型纯 API 查询组合（4+cn, 6+cn, 4+oversea, 6+oversea）。</span></td>
             </tr>
             <tr>
               <td><code>key</code></td>
-              <td><a href='https://api.eallion.com/ip?key=protocol' target="_blank"><span>key=protocol</span></a><br /><a href='https://api.eallion.com/ip?key=version' target="_blank"><span>key=version</span></a></td>
-              <td><span>返回单个指定字段（可选 <code>ip</code>, <code>protocol</code>, <code>version</code>, <code>type</code>, <code>isIPv4</code>, <code>isIPv6</code>, <code>countryName</code>, <code>cityName</code>, <code>asn</code> 等）。</span></td>
+              <td><a href='https://api.eallion.com/ip?key=protocol' target="_blank"><span>key=protocol</span></a><br /><a href='https://api.eallion.com/ip?key=source' target="_blank"><span>key=source</span></a></td>
+              <td><span>返回单个指定字段（可选 <code>ip</code>, <code>protocol</code>, <code>version</code>, <code>type</code>, <code>source</code>, <code>region</code>, <code>isIPv4</code>, <code>isIPv6</code>, <code>countryName</code>, <code>cityName</code>, <code>asn</code> 等）。</span></td>
             </tr>
           </tbody>
         </table>

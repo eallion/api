@@ -77,7 +77,6 @@ function renderLayout(data) {
           <span class="ip-value-large">${data.ip}</span>
           <button class="copy-btn" onclick="copyIP('${data.ip}')">复制</button>
         </div>
-        <div id="requested-ip-badge" class="requested-ip-badge" style="display:none; margin-top: 12px; font-size: 0.95rem; color: var(--text-secondary);"></div>
       </div>
     </div>
 
@@ -434,19 +433,6 @@ async function loadExternalIPs() {
   updateIP('ipify-ipv4', ipifyIPv4);
   updateIP('ipify-ipv6', ipifyIPv6);
 
-  // 若通过 ?v=4 或 ?v=6 访问且当前连接协议不一致，在主卡片直接展示本机探针解析出的目标 IP
-  const urlParams = new URLSearchParams(window.location.search);
-  const vParam = urlParams.get('v') || urlParams.get('version');
-  const badgeElement = document.getElementById('requested-ip-badge');
-  if (badgeElement) {
-    if (vParam === '4' && domesticIPv4 && domesticIPv4 !== 'Error' && domesticIPv4 !== 'Blocked') {
-      badgeElement.innerHTML = `已通过国内单栈探针解析到本机真实 IPv4：<strong>${domesticIPv4}</strong> <button class="copy-icon-btn" onclick="copyIP('${domesticIPv4}')" title="复制">复制</button>`;
-      badgeElement.style.display = 'block';
-    } else if (vParam === '6' && domesticIPv6 && domesticIPv6 !== 'Error' && domesticIPv6 !== 'NoIPv6' && domesticIPv6 !== 'Blocked') {
-      badgeElement.innerHTML = `已通过国内单栈探针解析到本机真实 IPv6：<strong>${domesticIPv6}</strong> <button class="copy-icon-btn" onclick="copyIP('${domesticIPv6}')" title="复制">复制</button>`;
-      badgeElement.style.display = 'block';
-    }
-  }
 
   // 更新右侧 IP.SB GEO 信息（优先使用 IPv4，其次使用 IPv6）
   const validIPSBGeo = ipsbIPv4Data.geo || ipsbIPv6Data.geo;

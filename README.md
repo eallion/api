@@ -88,19 +88,23 @@
 - **国内双栈检测**：通过国内专用 IPv4 与 IPv6 单栈端点独立探测真实公网 IP
 - **国际双栈检测**：通过国际专用 IPv4 与 IPv6 单栈端点独立探测真实公网 IP
 
-- **浏览器无参数访问**：直接展示**双栈 IP 分流查询 Web UI 页面**（顶部卡片展示默认访问 IP，并列展示国内/国外双栈检测卡片、EdgeOne GEO Info 与多服务商对比）。
-- **命令行工具访问（纯文本）**：`curl https://api.eallion.com/ip` 直接返回纯文本默认访问 IP（如 `1.2.3.4` 或 `240e:...`）。
-- **返回合并结构化元数据（JSON）**：`GET /ip?type=json` 或带请求头 `Accept: application/json`，合并返回包含 `ip`, `protocol`, `version`, `type`, `isIPv4`, `isIPv6`, `geo`, `timestamp` 的完整数据。
+- **浏览器无参数访问**：展示**双栈 IP 分流查询 Web UI 页面**（顶部卡片展示默认访问 IP，并列展示国内/国外双栈检测卡片、EdgeOne GEO Info 与多服务商对比）。
+- **命令行工具访问（纯文本）**：`curl https://api.eallion.com/ip` 直接返回纯文本默认公网 IP。
+- **纯 API 模式与参数组合**：凡携带 API 参数（如 `v=4`, `v=6`, `cn`, `oversea`, `key` 等）访问，默认返回纯文本 IP（`text/plain`）；指定 `type=json` 或请求头带 `Accept: application/json` 返回完整 JSON。支持 4 种典型分流组合查询：
+  - `GET /ip?v=4&cn`
+  - `GET /ip?v=6&cn`
+  - `GET /ip?v=4&oversea`
+  - `GET /ip?v=6&oversea`
+- **协议版本校验**：`GET /ip?v=4` 或 `GET /ip?v=6`。若当前连接协议匹配直接返回客户端 IP；若协议不匹配（如双栈系统默认通过 IPv6 握手但请求 `v=4`），返回 400 协议不匹配提示，不进行 302 重定向。终端可直接通过 `curl -4` 或 `curl -6` 强制对应协议握手。
 - **强制返回 Web UI 页面**：`GET /ip?type=html`
-- **协议版本校验与回落机制**：`GET /ip?v=4` 或 `GET /ip?v=6`。**浏览器访问完全不跳转**，保持在当前页面并由本地网卡发起异步探针展示真实 IP。终端命令行访问时，若当前连接协议不匹配默认不跳转（返回明确的 `curl -4` 指引）；如需由客户端跟随跳转至单栈端点，可显式指定 `mode=redirect`（配合 `curl -L`）。
-- **获取单个字段**：`GET /ip?key={name}`（支持 `ip`, `protocol`, `version`, `type`, `isIPv4`, `isIPv6` 以及地理位置 `countryName`, `cityName`, `asn` 等任意字段）
+- **获取单个字段**：`GET /ip?key={name}`（支持 `ip`, `protocol`, `version`, `type`, `source`, `region`, `isIPv4`, `isIPv6` 以及地理位置 `countryName`, `cityName`, `asn` 等任意字段）
 - **支持参数**：
   - `type` / `format`: `html`, `text`, `json`, `all`
   - `v` / `version`: `4` 或 `6`（协议版本匹配校验）
-  - `source` / `region`: `cn`（默认）或 `oversea`（配合 `v` 参数指定单栈数据源）
+  - `source` / `region`: `cn` 或 `oversea`（分流区域标记）
   - 标记参数: `cn`, `oversea`（支持直接作为查询标记传参，如 `?v=4&oversea`）
-  - `mode`: `redirect`（显式启用客户端 302 重定向）或 `fetch`（由边缘节点代为请求节点出口 IP）
-  - `key`: 指定返回单个字段（`ip`, `protocol`, `version`, `type`, `isIPv4`, `isIPv6`, `asn`, `countryName`, `cityName` 等）
+  - `mode`: `redirect`（仅在显式指定时启用 302 重定向）
+  - `key`: 指定返回单个字段（`ip`, `protocol`, `version`, `type`, `source`, `region`, `isIPv4`, `isIPv6`, `asn`, `countryName`, `cityName` 等）
 
 ### /lol
 
