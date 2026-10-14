@@ -1,195 +1,276 @@
+/**
+ * 解析客户端 IP 地址与协议版本 (IPv4 / IPv6)
+ */
+function parseIp(ip) {
+  if (!ip || typeof ip !== 'string') {
+    return {
+      ip: 'Unknown',
+      version: null,
+      type: 'Unknown',
+      isIPv4: false,
+      isIPv6: false,
+      isValid: false
+    };
+  }
+
+  const cleanIp = ip.trim().replace(/^\[|\]$/g, '');
+  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+  if (ipv4Regex.test(cleanIp)) {
+    return {
+      ip: cleanIp,
+      version: 4,
+      type: 'IPv4',
+      isIPv4: true,
+      isIPv6: false,
+      isValid: true
+    };
+  }
+
+  if (cleanIp.includes(':')) {
+    return {
+      ip: cleanIp,
+      version: 6,
+      type: 'IPv6',
+      isIPv4: false,
+      isIPv6: true,
+      isValid: true
+    };
+  }
+
+  return {
+    ip: cleanIp,
+    version: null,
+    type: 'Unknown',
+    isIPv4: false,
+    isIPv6: false,
+    isValid: false
+  };
+}
+
+/**
+ * 提取客户端真实 IP 地址
+ * 优先使用 EdgeOne Makers 原生能力 request.eo.clientIp
+ * 回退检查 EdgeOne 注入的请求头及通用反向代理头
+ */
+function getClientIp(request) {
+  if (request.eo && typeof request.eo.clientIp === 'string' && request.eo.clientIp) {
+    return request.eo.clientIp.trim();
+  }
+  const headers = request.headers;
+  const eoConnectingIp = headers.get('eo-connecting-ip');
+  if (eoConnectingIp) return eoConnectingIp.trim();
+  const eoClientIp = headers.get('eo-client-ip');
+  if (eoClientIp) return eoClientIp.trim();
+  const xForwardedFor = headers.get('x-forwarded-for');
+  if (xForwardedFor) return xForwardedFor.split(',')[0].trim();
+  const xRealIp = headers.get('x-real-ip');
+  if (xRealIp) return xRealIp.trim();
+  return 'Unknown';
+}
+
 export async function onRequest({ request }) {
+  const commonHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+    'Access-Control-Max-Age': '0'
+  };
+
+  // 处理 OPTIONS 预检请求
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: commonHeaders
+    });
+  }
+
   try {
-    // 解析 URL 和查询参数
     const url = new URL(request.url);
     const key = url.searchParams.get('key');
-    const type = url.searchParams.get('type');
-    
-    // 通过 EdgeOne 提供的 API 获取客户端真实 IP
-    const clientIP = request.eo?.clientIp || 'Unknown';
-    
-    // 通过 EdgeOne 提供的 API 获取地理位置信息
+    const type = url.searchParams.get('type') || url.searchParams.get('format');
+    const versionParam = url.searchParams.get('v') || url.searchParams.get('version');
+
+    const rawIp = getClientIp(request);
+    const ipInfo = parseIp(rawIp);
     const geoInfo = request.eo?.geo || {};
-    
-    // 可用的地理信息字段
+    const uuid = request.eo?.uuid || request.headers.get('eo-log-uuid') || '';
+
+    // 组织地理位置与网络数据
     const geoData = {
-      asn: geoInfo.asn || 'Unknown',
+      ip: ipInfo.ip,
+      version: ipInfo.version,
+      type: ipInfo.type,
+      isIPv4: ipInfo.isIPv4,
+      isIPv6: ipInfo.isIPv6,
+      asn: geoInfo.asn ?? 'Unknown',
       countryName: geoInfo.countryName || 'Unknown',
-      countryCodeAlpha2: geoInfo.countryCodeAlpha2 || 'Unknown',
+      countryCodeAlpha2: geoInfo.countryCodeAlpha2 || request.headers.get('eo-client-ipcountry') || 'Unknown',
       countryCodeAlpha3: geoInfo.countryCodeAlpha3 || 'Unknown',
       countryCodeNumeric: geoInfo.countryCodeNumeric || 'Unknown',
       regionName: geoInfo.regionName || 'Unknown',
       regionCode: geoInfo.regionCode || 'Unknown',
       cityName: geoInfo.cityName || 'Unknown',
-      latitude: geoInfo.latitude || 'Unknown',
-      longitude: geoInfo.longitude || 'Unknown'
+      latitude: geoInfo.latitude ?? 'Unknown',
+      longitude: geoInfo.longitude ?? 'Unknown',
+      ...(uuid ? { uuid } : {})
     };
-    
-    // 情况 1: 请求 IP 地址 (?key=ip)
-    if (key === 'ip') {
-      // 如果同时指定了 type=json，则返回 JSON 格式
-      if (type === 'json') {
-        return new Response(JSON.stringify({
-          status: "success",
-          code: 200,
-          data: {
-            ip: clientIP,
-            timestamp: Date.now()
+
+    // 检查指定的 IP 版本校验参数（如 ?v=4 或 ?v=6）
+    if (versionParam) {
+      const expectedVersion = parseInt(versionParam, 10);
+      if (expectedVersion === 4 || expectedVersion === 6) {
+        if (ipInfo.version !== expectedVersion) {
+          const mismatchMessage = `Protocol mismatch: requested IPv${expectedVersion}, but connected via ${ipInfo.type}`;
+          if (type === 'text') {
+            return new Response(`Error: ${mismatchMessage}\n`, {
+              status: 400,
+              headers: {
+                ...commonHeaders,
+                'Content-Type': 'text/plain;charset=UTF-8'
+              }
+            });
           }
-        }, null, 2), {
+          return new Response(JSON.stringify({
+            status: 'error',
+            code: 400,
+            message: mismatchMessage,
+            client: {
+              ip: ipInfo.ip,
+              version: ipInfo.version,
+              type: ipInfo.type
+            },
+            timestamp: Date.now()
+          }, null, 2), {
+            status: 400,
+            headers: {
+              ...commonHeaders,
+              'Content-Type': 'application/json;charset=UTF-8'
+            }
+          });
+        }
+      }
+    }
+
+    // 情况 1: 请求特定字段 (?key=fieldName)
+    if (key) {
+      if (Object.prototype.hasOwnProperty.call(geoData, key)) {
+        const value = geoData[key];
+
+        if (type === 'json') {
+          return new Response(JSON.stringify({
+            status: 'success',
+            code: 200,
+            data: {
+              [key]: value,
+              timestamp: Date.now()
+            }
+          }, null, 2), {
+            headers: {
+              ...commonHeaders,
+              'Content-Type': 'application/json;charset=UTF-8'
+            }
+          });
+        }
+
+        // 默认返回纯文本
+        return new Response(String(value), {
           headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'no-store',
-            'Access-Control-Max-Age': '0'
+            ...commonHeaders,
+            'Content-Type': 'text/plain;charset=UTF-8'
           }
         });
       }
-      
-      // 默认返回纯文本 IP
-      return new Response(clientIP, {
-        headers: {
-          'Content-Type': 'text/plain;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store',
-          'Access-Control-Max-Age': '0'
-        }
-      });
-    }
-    
-    // 情况 2: 请求特定地理字段 (?key=fieldName)
-    if (key && geoData.hasOwnProperty(key)) {
-      const value = geoData[key];
-      
-      // 如果同时指定了 type=json，则返回 JSON 格式
-      if (type === 'json') {
-        return new Response(JSON.stringify({
-          status: "success",
-          code: 200,
-          data: {
-            [key]: value,
-            timestamp: Date.now()
-          }
-        }, null, 2), {
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'no-store',
-            'Access-Control-Max-Age': '0'
-          }
-        });
-      }
-      
-      // 默认返回纯文本
-      return new Response(value.toString(), {
-        headers: {
-          'Content-Type': 'text/plain;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store',
-          'Access-Control-Max-Age': '0'
-        }
-      });
-    }
-    
-    // 情况 3: 请求所有数据 (?type=all 或 默认情况)
-    if (!key || type === 'all' || !type) {
-      return new Response(JSON.stringify({
-        status: "success",
-        code: 200,
-        data: {
-          ip: clientIP,
-          ...geoData,
-          timestamp: Date.now()
-        }
-      }, null, 2), {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store',
-          'Access-Control-Max-Age': '0'
-        }
-      });
-    }
-    
-    // 情况 4: 请求特定字段但字段不存在
-    if (key && key !== 'ip' && !geoData.hasOwnProperty(key)) {
-      if (type === 'json') {
-        return new Response(JSON.stringify({
-          status: "error",
-          code: 400,
-          message: `Invalid key: ${key}. Available keys: ip, ${Object.keys(geoData).join(', ')}`,
-          timestamp: Date.now()
-        }, null, 2), {
+
+      // 请求的 key 不存在
+      const availableKeys = Object.keys(geoData).join(', ');
+      if (type === 'text') {
+        return new Response(`Invalid key: ${key}. Available keys: ${availableKeys}\n`, {
           status: 400,
           headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'no-store',
-            'Access-Control-Max-Age': '0'
+            ...commonHeaders,
+            'Content-Type': 'text/plain;charset=UTF-8'
           }
         });
       }
-      
-      return new Response('Invalid key', {
+
+      return new Response(JSON.stringify({
+        status: 'error',
+        code: 400,
+        message: `Invalid key: ${key}. Available keys: ${availableKeys}`,
+        timestamp: Date.now()
+      }, null, 2), {
         status: 400,
         headers: {
-          'Content-Type': 'text/plain;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store',
-          'Access-Control-Max-Age': '0'
+          ...commonHeaders,
+          'Content-Type': 'application/json;charset=UTF-8'
         }
       });
     }
-    
-    // 默认情况：返回所有数据的 JSON
+
+    // 情况 2: 请求纯文本格式 (?type=text 或 ?format=text)
+    if (type === 'text') {
+      const textOutput = [
+        `ip: ${geoData.ip}`,
+        `version: ${geoData.version}`,
+        `type: ${geoData.type}`,
+        `country: ${geoData.countryName} (${geoData.countryCodeAlpha2})`,
+        `region: ${geoData.regionName}`,
+        `city: ${geoData.cityName}`,
+        `asn: ${geoData.asn}`,
+        `latitude: ${geoData.latitude}`,
+        `longitude: ${geoData.longitude}`
+      ].join('\n');
+
+      return new Response(textOutput, {
+        headers: {
+          ...commonHeaders,
+          'Content-Type': 'text/plain;charset=UTF-8'
+        }
+      });
+    }
+
+    // 默认情况：返回完整 JSON
     return new Response(JSON.stringify({
-      status: "success",
+      status: 'success',
       code: 200,
       data: {
-        ip: clientIP,
         ...geoData,
         timestamp: Date.now()
       }
     }, null, 2), {
       headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'no-store',
-        'Access-Control-Max-Age': '0'
+        ...commonHeaders,
+        'Content-Type': 'application/json;charset=UTF-8'
       }
     });
+
   } catch (error) {
     console.error('Error processing GEO request:', error);
-    
-    // 解析 URL 和查询参数（错误处理中再次解析）
     const url = new URL(request.url);
-    const type = url.searchParams.get('type');
-    
-    if (type === 'json' || !type || type === 'all') {
-      return new Response(JSON.stringify({
-        status: "error",
-        code: 500,
-        message: "Internal Server Error",
-        timestamp: Date.now()
-      }), {
+    const type = url.searchParams.get('type') || url.searchParams.get('format');
+
+    if (type === 'text') {
+      return new Response('Error retrieving geo information', {
         status: 500,
         headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-store',
-          'Access-Control-Max-Age': '0'
+          ...commonHeaders,
+          'Content-Type': 'text/plain;charset=UTF-8'
         }
       });
     }
-    
-    // 默认返回纯文本错误
-    return new Response('Error retrieving geo information', {
+
+    return new Response(JSON.stringify({
+      status: 'error',
+      code: 500,
+      message: 'Internal Server Error',
+      timestamp: Date.now()
+    }, null, 2), {
       status: 500,
       headers: {
-        'Content-Type': 'text/plain;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'no-store',
-        'Access-Control-Max-Age': '0'
+        ...commonHeaders,
+        'Content-Type': 'application/json;charset=UTF-8'
       }
     });
   }

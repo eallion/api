@@ -28,7 +28,16 @@
 
 ### /geo
 
-返回客户端的地理位置。
+基于 EdgeOne Makers 原生能力（`request.eo.geo` 与 `request.eo.clientIp`）返回客户端地理位置及网络信息，支持 IPv4 与 IPv6。支持 `/geo` 与 `/api/geo`。
+
+- **默认返回完整数据（JSON）**：`GET /geo`
+- **获取单个字段**：`GET /geo?key={fieldName}`（如 `key=ip`, `key=version`, `key=countryName`, `key=cityName`, `key=asn` 等，默认返回纯文本；添加 `&type=json` 返回 JSON）
+- **纯文本输出全部**：`GET /geo?type=text`
+- **协议版本校验**：`GET /geo?v=4` 或 `GET /geo?v=6`（若当前连接协议与指定版本不一致，返回 400 错误）
+- **支持参数**：
+  - `key`: 指定返回字段（`ip`, `version`, `type`, `asn`, `countryName`, `countryCodeAlpha2`, `cityName`, `latitude`, `longitude` 等）
+  - `type` / `format`: `json`（默认）或 `text`
+  - `v` / `version`: `4` 或 `6`（协议版本匹配校验）
 
 ### /gravatar
 
@@ -73,7 +82,25 @@
 
 ### /ip
 
-返回客户端的公网 IP 地址。
+基于 EdgeOne Makers 原生能力（`request.eo.clientIp`）返回客户端默认公网 IP 及双栈分流信息，支持 IPv4 与 IPv6。已合并原 `ip.eallion.com` 项目，同时支持 `/ip` 与 `/api/ip`。
+
+内置双栈检测探针架构：
+- **国内双栈检测**：通过国内专用 IPv4 与 IPv6 单栈端点独立探测真实公网 IP
+- **国际双栈检测**：通过国际专用 IPv4 与 IPv6 单栈端点独立探测真实公网 IP
+
+- **浏览器无参数访问**：直接展示**双栈 IP 分流查询 Web UI 页面**（顶部卡片展示默认访问 IP，并列展示国内/国外双栈检测卡片、EdgeOne GEO Info 与多服务商对比）。
+- **命令行工具访问（纯文本）**：`curl https://api.eallion.com/ip` 直接返回纯文本默认访问 IP（如 `1.2.3.4` 或 `240e:...`）。
+- **返回合并结构化元数据（JSON）**：`GET /ip?type=json` 或带请求头 `Accept: application/json`，合并返回包含 `ip`, `protocol`, `version`, `type`, `isIPv4`, `isIPv6`, `geo`, `timestamp` 的完整数据。
+- **强制返回 Web UI 页面**：`GET /ip?type=html`
+- **协议版本校验与回落机制**：`GET /ip?v=4` 或 `GET /ip?v=6`。**浏览器访问完全不跳转**，保持在当前页面并由本地网卡发起异步探针展示真实 IP。终端命令行访问时，若当前连接协议不匹配默认不跳转（返回明确的 `curl -4` 指引）；如需由客户端跟随跳转至单栈端点，可显式指定 `mode=redirect`（配合 `curl -L`）。
+- **获取单个字段**：`GET /ip?key={name}`（支持 `ip`, `protocol`, `version`, `type`, `isIPv4`, `isIPv6` 以及地理位置 `countryName`, `cityName`, `asn` 等任意字段）
+- **支持参数**：
+  - `type` / `format`: `html`, `text`, `json`, `all`
+  - `v` / `version`: `4` 或 `6`（协议版本匹配校验）
+  - `source` / `region`: `cn`（默认）或 `oversea`（配合 `v` 参数指定单栈数据源）
+  - 标记参数: `cn`, `oversea`（支持直接作为查询标记传参，如 `?v=4&oversea`）
+  - `mode`: `redirect`（显式启用客户端 302 重定向）或 `fetch`（由边缘节点代为请求节点出口 IP）
+  - `key`: 指定返回单个字段（`ip`, `protocol`, `version`, `type`, `isIPv4`, `isIPv6`, `asn`, `countryName`, `cityName` 等）
 
 ### /lol
 

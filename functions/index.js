@@ -49,15 +49,16 @@ export async function onRequest() {
       },
       "/geo": {
         endpoint: "https://api.eallion.com/geo",
-        sample: "https://api.eallion.com/geo?key=countryName&type=json",
+        sample: "https://api.eallion.com/geo?key=cityName&type=json",
         docs: "https://cloud.tencent.com/document/product/1552/107291",
         parameters: {
           "key": [
-            "ip", "asn", "countryName", "countryCodeAlpha2", "countryCodeAlpha3", 
-            "countryCodeNumeric", "regionName", "regionCode", "cityName", 
-            "latitude", "longitude"
+            "ip", "version", "type", "isIPv4", "isIPv6", "asn", "countryName", 
+            "countryCodeAlpha2", "countryCodeAlpha3", "countryCodeNumeric", 
+            "regionName", "regionCode", "cityName", "latitude", "longitude"
           ],
-          "type": "json"
+          "type": ["json", "text"],
+          "v": ["4", "6"]
         }
       },
       "/gravatar": {
@@ -83,10 +84,14 @@ export async function onRequest() {
       },
       "/ip": {
         endpoint: "https://api.eallion.com/ip",
-        sample: "https://api.eallion.com/ip",
+        sample: "https://api.eallion.com/ip?type=json",
         docs: "https://cloud.tencent.com/document/product/1552/101774",
         parameters: {
-          "type": ["json", "all"]
+          "type": ["html", "text", "json", "all"],
+          "v": ["4", "6"],
+          "source": ["cn", "oversea"],
+          "mode": ["redirect", "fetch"],
+          "key": ["ip", "protocol", "version", "type", "isIPv4", "isIPv6"]
         }
       },
       "/lol": {
@@ -229,15 +234,16 @@ export async function onRequest() {
       },
       "/geo": {
         endpoint: "https://api.eallion.com/geo",
-        sample: "https://api.eallion.com/geo?key=countryName&type=json",
+        sample: "https://api.eallion.com/geo?key=cityName&type=json",
         docs: "https://cloud.tencent.com/document/product/1552/107291",
         parameters: {
           "key": [
-            "ip", "asn", "countryName", "countryCodeAlpha2", "countryCodeAlpha3", 
-            "countryCodeNumeric", "regionName", "regionCode", "cityName", 
-            "latitude", "longitude"
+            "ip", "version", "type", "isIPv4", "isIPv6", "asn", "countryName", 
+            "countryCodeAlpha2", "countryCodeAlpha3", "countryCodeNumeric", 
+            "regionName", "regionCode", "cityName", "latitude", "longitude"
           ],
-          "type": "json"
+          "type": ["json", "text"],
+          "v": ["4", "6"]
         }
       },
       "/gravatar": {
@@ -250,10 +256,14 @@ export async function onRequest() {
       },
       "/ip": {
         endpoint: "https://api.eallion.com/ip",
-        sample: "https://api.eallion.com/ip",
+        sample: "https://api.eallion.com/ip?type=json",
         docs: "https://cloud.tencent.com/document/product/1552/101774",
         parameters: {
-          "type": ["json", "all"]
+          "type": ["html", "text", "json", "all"],
+          "v": ["4", "6"],
+          "source": ["cn", "oversea"],
+          "mode": ["redirect", "fetch"],
+          "key": ["ip", "protocol", "version", "type", "isIPv4", "isIPv6"]
         }
       },
       "/mastodon": {

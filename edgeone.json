@@ -16,6 +16,16 @@
       "pattern": "/translate",
       "script": "functions/translate/index.js",
       "methods": ["GET"]
+    },
+    {
+      "pattern": "/api/ip",
+      "script": "functions/ip/index.js",
+      "methods": ["GET", "HEAD", "OPTIONS"]
+    },
+    {
+      "pattern": "/api/geo",
+      "script": "functions/geo/index.js",
+      "methods": ["GET", "HEAD", "OPTIONS"]
     }
   ],
   "redirects": [
@@ -80,6 +90,24 @@
       },
       {
         "source": "/geo*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store, max-age=0, s-maxage=0, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/api/ip*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store, max-age=0, s-maxage=0, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/api/geo*",
         "headers": [
           {
             "key": "Cache-Control",
@@ -172,6 +200,14 @@
     },
     {
       "source": "/geo*",
+      "cacheTtl": 0
+    },
+    {
+      "source": "/api/ip*",
+      "cacheTtl": 0
+    },
+    {
+      "source": "/api/geo*",
       "cacheTtl": 0
     }
   ]

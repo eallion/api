@@ -140,7 +140,8 @@
         </table>
       </figure>
       <h3 id='ip'><code>/ip</code><span></span></h3>
-      <p><span>获取自己的公网 IP </span></p>
+      <p><span>基于 EdgeOne Makers 原生能力（<code>request.eo.clientIp</code>）获取客户端默认接入公网 IP，支持 IPv4 与 IPv6。已合并原 <code>ip.eallion.com</code> 项目，同时支持 <code>/ip</code> 与 <code>/api/ip</code>。</span></p>
+      <p><span>内置双栈分流检测探针：分别通过国内与国际专用单栈节点，独立并发探测客户端真实 IPv4 与 IPv6 连通性。</span></p>
       <blockquote>
         <p><a href='https://api.eallion.com/ip' target="_blank"><span>https://api.eallion.com/ip</span></a></p>
       </blockquote>
@@ -155,14 +156,39 @@
           </thead>
           <tbody>
             <tr>
-              <td><code>ip</code></td>
-              <td><a href='https://api.eallion.com/ip' target="_blank"><span>ip</span></a></td>
-              <td><span>返回公网 IP，支持 IPv6，返回默认值。</span></td>
+              <td><code>默认 (无参数)</code></td>
+              <td><a href='https://api.eallion.com/ip' target="_blank"><span>/ip</span></a></td>
+              <td><span>浏览器访问时默认展示<strong>双栈 IP 分流查询 Web UI 界面</strong>；终端工具（如 <code>curl</code>）调用时返回纯文本 IP。</span></td>
+            </tr>
+            <tr>
+              <td><code>type=html</code></td>
+              <td><a href='https://api.eallion.com/ip?type=html' target="_blank"><span>type=html</span></a></td>
+              <td><span>强制返回双栈 IP 分流查询 Web UI 完整页面。</span></td>
             </tr>
             <tr>
               <td><code>type=json</code></td>
               <td><a href='https://api.eallion.com/ip?type=json' target="_blank"><span>type=json</span></a></td>
-              <td><span>返回 <code>.json</code>格式的公网 IP，支持 IPv6，返回默认值。</span></td>
+              <td><span>合并返回结构化 JSON（包含 <code>ip</code>, <code>protocol</code>, <code>version</code>, <code>type</code>, <code>isIPv4</code>, <code>isIPv6</code>, <code>geo</code>, <code>timestamp</code>）。</span></td>
+            </tr>
+            <tr>
+              <td><code>type=text</code></td>
+              <td><a href='https://api.eallion.com/ip?type=text' target="_blank"><span>type=text</span></a></td>
+              <td><span>强制返回纯文本 IP 地址（即使在浏览器中）。</span></td>
+            </tr>
+            <tr>
+              <td><code>v=4 / v=6</code></td>
+              <td><a href='https://api.eallion.com/ip?v=4' target="_blank"><span>v=4</span></a><br /><a href='https://api.eallion.com/ip?v=4&amp;oversea' target="_blank"><span>v=4&amp;oversea</span></a><br /><a href='https://api.eallion.com/ip?v=6' target="_blank"><span>v=6</span></a></td>
+              <td><span>校验协议版本。<strong>浏览器访问完全不跳转</strong>，直接在页面内由本机发起异步探针并展示真实 IP。终端命令行访问时，若当前连接协议不匹配默认不跳转并给出 <code>curl -4</code> 原生指引；显式添加 <code>mode=redirect</code>（如 <code>curl -L "https://api.eallion.com/ip?v=4&amp;mode=redirect"</code>）可重定向至单栈目标。</span></td>
+            </tr>
+            <tr>
+              <td><code>source / cn / oversea</code></td>
+              <td><a href='https://api.eallion.com/ip?v=4&amp;cn' target="_blank"><span>v=4&amp;cn</span></a><br /><a href='https://api.eallion.com/ip?v=4&amp;source=oversea' target="_blank"><span>source=oversea</span></a></td>
+              <td><span>指定回落数据源，可选 <code>cn</code>（国内单栈，默认）或 <code>oversea</code>（国际单栈）。可作为布尔标记（<code>?v=4&amp;cn</code>）或键值参数（<code>?v=4&amp;source=oversea</code>）。</span></td>
+            </tr>
+            <tr>
+              <td><code>key</code></td>
+              <td><a href='https://api.eallion.com/ip?key=protocol' target="_blank"><span>key=protocol</span></a><br /><a href='https://api.eallion.com/ip?key=version' target="_blank"><span>key=version</span></a></td>
+              <td><span>返回单个指定字段（可选 <code>ip</code>, <code>protocol</code>, <code>version</code>, <code>type</code>, <code>isIPv4</code>, <code>isIPv6</code>, <code>countryName</code>, <code>cityName</code>, <code>asn</code> 等）。</span></td>
             </tr>
           </tbody>
         </table>
@@ -191,9 +217,9 @@
         </table>
       </figure>
       <h3 id='geo'><code>/geo</code></h3>
-      <p><span>获取自己的 Geo 信息 </span></p>
+      <p><span>基于 EdgeOne Makers 原生能力（<code>request.eo.geo</code> 与 <code>request.eo.clientIp</code>）获取客户端真实地理位置及网络信息，支持 IPv4 与 IPv6。同时支持 <code>/geo</code> 与 <code>/api/geo</code>。</span></p>
       <blockquote>
-        <p><a href='https://api.eallion.com/geo?key=cityName&type=json' target="_blank"><span>https://api.eallion.com/geo?key=cityName&type=json</span></a></p>
+        <p><a href='https://api.eallion.com/geo' target="_blank"><span>https://api.eallion.com/geo</span></a></p>
       </blockquote>
       <figure class='table-figure'>
         <table>
@@ -206,17 +232,26 @@
           </thead>
           <tbody>
             <tr>
+              <td><code>默认 (json)</code></td>
+              <td><a href='https://api.eallion.com/geo' target="_blank"><span>/geo</span></a></td>
+              <td><span>默认返回完整 JSON（包含 <code>ip</code>, <code>version</code>, <code>type</code>, <code>isIPv4</code>, <code>isIPv6</code>, <code>asn</code>, <code>countryName</code>, <code>countryCodeAlpha2</code>, <code>countryCodeAlpha3</code>, <code>countryCodeNumeric</code>, <code>regionName</code>, <code>regionCode</code>, <code>cityName</code>, <code>latitude</code>, <code>longitude</code>）。</span></td>
+            </tr>
+            <tr>
               <td><code>key</code></td>
-              <td><a href='https://api.eallion.com/geo?key=cityName' target="_blank"><span>key=cityName</span></a>
-              </td>
+              <td><a href='https://api.eallion.com/geo?key=cityName' target="_blank"><span>key=cityName</span></a><br /><a href='https://api.eallion.com/geo?key=countryName&amp;type=json' target="_blank"><span>key=countryName&amp;type=json</span></a></td>
               <td>
-                <span>可用的 key：</span><code>ip</code>、<code>asn</code>、<code>countryName</code>、<code>countryCodeAlpha2</code>、<code>countryCodeAlpha3</code>、<code>countryCodeNumeric</code>、<code>regionName</code>、<code>regionCode</code>、<code>cityName</code>、<code>latitude</code>、<code>longitude</code>
+                <span>获取指定字段，默认返回纯文本（添加 <code>type=json</code> 返回 JSON）。可用的 key：<code>ip</code>, <code>version</code>, <code>type</code>, <code>asn</code>, <code>countryName</code>, <code>countryCodeAlpha2</code>, <code>countryCodeAlpha3</code>, <code>countryCodeNumeric</code>, <code>regionName</code>, <code>regionCode</code>, <code>cityName</code>, <code>latitude</code>, <code>longitude</code>。</span>
               </td>
             </tr>
             <tr>
-              <td><code>type=json</code></td>
-              <td><a href='https://api.eallion.com/geo?type=json' target="_blank"><span>type=json</span></a></td>
-              <td><span>返回 <code>.json</code>格式的 Geo 信息，支持 IPv6，返回默认值。</span></td>
+              <td><code>type=text</code></td>
+              <td><a href='https://api.eallion.com/geo?type=text' target="_blank"><span>type=text</span></a></td>
+              <td><span>以纯文本换行格式输出所有地理位置与网络字段。</span></td>
+            </tr>
+            <tr>
+              <td><code>v=4 / v=6</code></td>
+              <td><a href='https://api.eallion.com/geo?v=4' target="_blank"><span>v=4</span></a><br /><a href='https://api.eallion.com/geo?v=6' target="_blank"><span>v=6</span></a></td>
+              <td><span>强制校验当前连接的协议版本，若不匹配返回 400 错误。</span></td>
             </tr>
           </tbody>
         </table>
